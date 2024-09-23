@@ -1,0 +1,13 @@
+{
+  "type": "your value",
+  "project_id": "your value",
+  "private_key_id": "your value",
+  "private_key": "your value",
+  "client_email": "your value",
+  "client_id": "your value",
+  "auth_uri": "your value",
+  "token_uri": "your value",
+  "auth_provider_x509_cert_url": "your value",
+  "client_x509_cert_url": "your value",
+  "universe_domain": "your value"
+}
