@@ -52,7 +52,7 @@ username = config.get('mongodb', 'username')
 password = config.get('mongodb', 'password')
 hostlocation = config.get('mongodb', 'hostlocation')
 # myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-cluster_url =f"mongodb+srv://{username}:{password}@{hostlocation}/?retryWrites=true&w=majority&appName=GueiMing"
+cluster_url =f"mongodb+srv://{username}:{password}@{hostlocation}"
 myclient = pymongo.MongoClient(cluster_url, username=username,password=password)
 
 

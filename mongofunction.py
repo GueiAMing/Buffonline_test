@@ -268,6 +268,22 @@ def getuseridlist():
     useridlist=set(mydoc["userids"])
     return useridlist
 
+'''更新使用者總人數'''
+def getUpdateUids():
+    '''更新使用者總人數'''
+    lock = threading.Lock()
+    with lock:
+        try:
+            mycol = dbmethod("buff_online","userid_points")
+            mydoc = mycol.find_one({"_id":"0"})
+            now_members = mydoc["numbers of uid"]
+            now_uid = now_members + 1
+            mycol.update_one({"_id":"0"},{"$set":{"numbers of uid":now_uid}}) 
+            str_now_uid = str(now_uid).zfill(8)
+        except:
+            pass
+    return str_now_uid
+
 '''發點數卡'''
 def getPoints_write_into_useridpoints(userId, nickname):
     '''發點數卡'''
@@ -278,11 +294,12 @@ def getPoints_write_into_useridpoints(userId, nickname):
         tzone = timezone(timedelta(hours=8))
         nowyeardatetime = datetime.now(tz=tzone)
         nowyeardatetime = nowyeardatetime.isoformat()[:16].replace("T","-")
+        this_user_uid = getUpdateUids()
         try:
             mydb = myclient["buff_online"]
             mycol = mydb["userid_points"]
             mycol.update_one({"_id": "1"},{"$set":{"userids":list(temp_useridslist)}})
-            mycol.insert_one({"_id":userId,"nickname":nickname,"got_reward_card_time":nowyeardatetime,"points":1})
+            mycol.insert_one({"_id":userId,"nickname":nickname,"got_reward_card_time":nowyeardatetime,"points":1,"uid":this_user_uid})
             print(f"{userId}獲得點數卡")
         except:
             print(f"{userId}獲得點數卡，失敗")
@@ -857,8 +874,8 @@ def getMypointsCard(userId):
     mydb = myclient["buff_online"]
     mycol = mydb["userid_points"]
     mydoc = mycol.find_one({"_id":userId})
-
-
+    
+    this_user_uid = mydoc["uid"]
     point = mydoc["points"]
     nickname = mydoc["nickname"]
 
@@ -876,13 +893,20 @@ def getMypointsCard(userId):
     "contents": [
       {
         "type": "box",
-        "layout": "vertical",
+        "layout": "horizontal",
         "contents": [
           {
             "type": "text",
             "text": f"{nickname}的點數卡",
             "weight": "bold",
             "size": "20px"
+          },
+          {
+            "type": "text",
+            "text": f"No.{this_user_uid[:4]} {this_user_uid[4:]}",
+            "weight": "bold",
+            "align":"end",
+            "size": "16px"
           }
           
         ]
