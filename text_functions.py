@@ -7,8 +7,8 @@ def getOpenText():
     lock = threading.Lock()
     with lock:
         try:
-            mycol = dbmethod("buff_online","state")
-            mycol.update_one({"_id":0},{"$set":{"state":1}}) 
+            mycol = dbmethod("buff_online_test","state")
+            mycol.update_one({"_id":0},{"$set":{"state":1}},True) 
             message = {
                 "type":"text",
                 "text":f"切換狀態為營業中\nstate:1"
@@ -27,8 +27,8 @@ def getClosedText():
     lock = threading.Lock()
     with lock:
         try:
-            mycol = dbmethod("buff_online","state")
-            mycol.update_one({"_id":0},{"$set":{"state":0}}) 
+            mycol = dbmethod("buff_online_test","state")
+            mycol.update_one({"_id":0},{"$set":{"state":0}},True) 
             message = {
                 "type":"text",
                 "text":"切換狀態為休息\nstate:0"
