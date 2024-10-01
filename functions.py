@@ -9,7 +9,7 @@ def getyeardatedict():
     '''取得日期被預約時間'''
     lock =threading.Lock()
     with lock:
-        mycol = dbmethod( "buff_online", "yeardate_time")
+        mycol = dbmethod( "buff_online_test", "yeardate_time")
         tzone = timezone(timedelta(hours=8))
         now = datetime.now(tz=tzone)
         id = now.isoformat()[5:7]
@@ -21,7 +21,7 @@ def getyeardatedict():
 '''取得使用者歷史預約角色名稱'''
 def getusertraderpartner():
     '''取得使用者歷史預約角色名稱'''
-    mycol = dbmethod( "buff_online", "userid_trader_partner")
+    mycol = dbmethod( "buff_online_test", "userid_trader_partner")
     mydoc = mycol.find_one({"_id" : "userid"},{"_id":0})
     if mydoc is None:
         mydoc = dict()
@@ -32,7 +32,7 @@ def getusertraderpartner():
 '''取得使用者預約日期時間'''   
 def getuseridyeardatetime(userId):
     '''取得使用者預約日期時間'''
-    mycol = dbmethod( "buff_online", "userid_yeardate_time")
+    mycol = dbmethod( "buff_online_test", "userid_yeardate_time")
     mydoc = mycol.find({},{"_id": 0,"userid":0})
     # mydoc = mycol.find({})
     
@@ -117,7 +117,7 @@ def getUseridOrder(userId):
     tzone = timezone(timedelta(hours=8))
     yeardate = datetime.now(tz=tzone)
     yeardate = yeardate.isoformat().split("T")[0].replace("-","")[2:]
-    mycol = dbmethod("buff_online",f"final_order_{str(yeardate)}")
+    mycol = dbmethod("buff_online_test",f"final_order_{str(yeardate)}")
 
     # mydoc = mycol.find({'userId':userId},{'Date':1,'time':1})
     mydoc = mycol.find({'userId':userId}).sort('time',1)

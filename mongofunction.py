@@ -32,7 +32,7 @@ def writeintotemporder_thesame(userId):
     from functions import getusertraderpartner #避免 circular import，所以寫在函式裡面
     lock = threading.Lock()
     with lock:
-        mycol = dbmethod( "buff_online", "userid_trader_partner")
+        mycol = dbmethod( "buff_online_test", "userid_trader_partner")
         mydoc = mycol.find_one({"_id":"userid"})
         USERID_TRADER_PARTNER = getusertraderpartner()
         USERID_TRADER_PARTNER[userId] = mydoc[userId]
@@ -42,16 +42,16 @@ def writeintotemporder_thesame(userId):
         tzone = timezone(timedelta(hours=8))
         nowtime_thesame = datetime.now(tz=tzone).isoformat()[:16] 
         try:
-            mycol = dbmethod( "buff_online", "userid_points")
+            mycol = dbmethod( "buff_online_test", "userid_points")
             mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
             nicknameofthisuser = mydoc["nickname"]
-            mycol = dbmethod( "buff_online", "userid_trader_partner")
+            mycol = dbmethod( "buff_online_test", "userid_trader_partner")
             mycol.update_one({"_id":"userid"},{"$set":{userId:USERID_TRADER_PARTNER[userId]}},True)
             mycol.update_one({"_id": userId },{"$set":{
                                                         'TRADER_PARTNER':USERID_TRADER_PARTNER[userId],
                                                         'nickname': nicknameofthisuser,
                                                         'writetime':nowtime_thesame,}},True)
-            mycol = dbmethod( "buff_online", "temp_order")
+            mycol = dbmethod( "buff_online_test", "temp_order")
             mycol.update_one({"userId":userId},{"$set":{
                                                         'userId':userId,
                                                         'writetime':nowtime_thesame,
@@ -97,16 +97,16 @@ def writeintotemporder_nonthesame( text, userId):
         tzone = timezone(timedelta(hours=8))
         nowtime_nonthesame = datetime.now(tz=tzone).isoformat()[:16] 
         try:
-            mycol = dbmethod( "buff_online", "userid_points")
+            mycol = dbmethod( "buff_online_test", "userid_points")
             mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
             nicknameofthisuser = mydoc["nickname"]
-            mycol = dbmethod( "buff_online", "userid_trader_partner")
+            mycol = dbmethod( "buff_online_test", "userid_trader_partner")
             mycol.update_one({"_id":"userid"},{"$set":{userId:[ tradeName, partyName]}},True)
             mycol.update_one({"_id": userId },{"$set":{
                                                         'TRADER_PARTNER':[ tradeName, partyName],
                                                         'nickname': nicknameofthisuser,
                                                         'writetime':nowtime_nonthesame,}},True)
-            mycol = dbmethod( "buff_online", "temp_order")
+            mycol = dbmethod( "buff_online_test", "temp_order")
             mycol.update_one({"userId":userId},{"$set":{
                                                         'userId':userId,
                                                         "writetime":nowtime_nonthesame,
@@ -120,7 +120,7 @@ def writeintotemporder_nonthesame( text, userId):
                                                         },
                                                         True
                         )
-            mycol = dbmethod( "buff_online", "userid_points")
+            mycol = dbmethod( "buff_online_test", "userid_points")
             mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
             nicknameofthisuser = mydoc["nickname"]
             data = [
@@ -156,7 +156,7 @@ def writeintotemporder_secondtime(userId, data):
     nowtime = datetime.now(tz=tzone).isoformat()[:16]
     with lock:
         try:
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb[f"temp_order"]
             mycol.update_one({"userId":userId},{"$set":{
                                                         'userId':userId,
@@ -169,7 +169,7 @@ def writeintotemporder_secondtime(userId, data):
                             )
             tzone = timezone(timedelta(hours=8))
             nowtime = datetime.now(tz=tzone).isoformat()[:16]
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb["userid_points"]
             mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
             nicknameofthisuser = mydoc["nickname"]
@@ -195,7 +195,7 @@ def writeintotemporder_secondtime(userId, data):
     lock = threading.Lock()
     with lock:
         try:
-            mydb = myclient["buff_online"]           
+            mydb = myclient["buff_online_test"]           
             mycol = mydb["userid_yeardate_time"]
             mycol.update_one({"userid":userId},{"$set":{
                                                         userId:[reservedDate,reservedTime]
@@ -205,7 +205,7 @@ def writeintotemporder_secondtime(userId, data):
                             )
             tzone = timezone(timedelta(hours=8))
             nowtime = datetime.now(tz=tzone).isoformat()[:16]
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb["userid_points"]
             mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
             nicknameofthisuser = mydoc["nickname"]
@@ -263,7 +263,7 @@ def getConfirmFinalOrder(userId):
 '''獲取使用者清單'''
 def getuseridlist():
     '''獲取使用者清單'''
-    mycol = dbmethod( "buff_online", "userid_points")
+    mycol = dbmethod( "buff_online_test", "userid_points")
     mydoc = mycol.find_one({"_id": "1"})
     useridlist=set(mydoc["userids"])
     return useridlist
@@ -274,7 +274,7 @@ def getUpdateUids():
     lock = threading.Lock()
     with lock:
         try:
-            mycol = dbmethod("buff_online","userid_points")
+            mycol = dbmethod("buff_online_test","userid_points")
             mydoc = mycol.find_one({"_id":"0"})
             now_members = mydoc["numbers of uid"]
             now_uid = now_members + 1
@@ -296,7 +296,7 @@ def getPoints_write_into_useridpoints(userId, nickname):
         nowyeardatetime = nowyeardatetime.isoformat()[:16].replace("T","-")
         this_user_uid = getUpdateUids()
         try:
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb["userid_points"]
             mycol.update_one({"_id": "1"},{"$set":{"userids":list(temp_useridslist)}})
             mycol.insert_one({"_id":userId,"nickname":nickname,"got_reward_card_time":nowyeardatetime,"points":1,"uid":this_user_uid})
@@ -314,7 +314,7 @@ def CountOrdersofUserid(userId):
         yeardate = datetime.now(tz=tzone)
         yeardate = yeardate.isoformat().split("T")[0]
         yeardate = yeardate.replace("-","")[2:]
-        mydb = myclient["buff_online"]
+        mydb = myclient["buff_online_test"]
         mycol = mydb[f"final_order_{yeardate}"]
         mydoc = mycol.find({"userId":userId})
         print(mydoc)
@@ -388,7 +388,7 @@ def getGetAllorders():
     yeardate = datetime.now(tz=tzone)
     yeardate = yeardate.isoformat().split("T")[0].replace("-","")[2:]
     print("日期",yeardate)
-    mycol = dbmethod("buff_online", f"final_order_{str(yeardate)}")
+    mycol = dbmethod("buff_online_test", f"final_order_{str(yeardate)}")
     # mydoc = mycol.find({'userId':userId},{'Date':1,'time':1})
     mydoc = mycol.find({}).sort('time',1)
     print("管理員拿全部訂單")
@@ -453,7 +453,7 @@ def getDeleteSomeOrderList(Timelist):
     lock = threading.Lock()
     with lock:
         try:
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb[f"final_order_{dbyeardate}"]
             for time in Timelist:
                 mycol.delete_one({"time":time})
@@ -464,7 +464,7 @@ def getDeleteSomeOrderList(Timelist):
 '''查看user個人點數'''
 def getMyPointsText(userId):
     '''查看user個人點數'''
-    mydb = myclient["buff_online"]
+    mydb = myclient["buff_online_test"]
     mycol = mydb["userid_points"]
     mydoc = mycol.find_one({"_id":userId})
 
@@ -486,7 +486,7 @@ def getUpdatePoints():
         yeardate = datetime.now(tz=tzone)
         yeardate = yeardate.isoformat().split("T")[0]
         yeardate = yeardate.replace("-","")[2:]
-        mycol = dbmethod("buff_online",f"final_order_{yeardate}")
+        mycol = dbmethod("buff_online_test",f"final_order_{yeardate}")
         mydoc = mycol.find({},{"_id":0,'userId': 1,'point': 1})
         updatepoint_userid = set()
         list1 = list(mydoc)
@@ -497,9 +497,9 @@ def getUpdatePoints():
             # print(type(updatepoint_userid))
         for userId in updatepoint_userid:
             try:
-                mycol = dbmethod("buff_online",f"final_order_{yeardate}")
+                mycol = dbmethod("buff_online_test",f"final_order_{yeardate}")
                 mydoc = mycol.count_documents({"userId":userId})
-                mycol = dbmethod("buff_online","userid_points")
+                mycol = dbmethod("buff_online_test","userid_points")
                 mycol.update_one({"_id":userId},{"$inc":{"points":mydoc}})
                 print("更新點數成功。")
                 message = {
@@ -517,7 +517,7 @@ def getUpdatePoints():
 '''兌換時先查詢user點數用'''
 def getuserIdPoints(userId):
     '''兌換時先查詢user點數用'''
-    mycol = dbmethod("buff_online", "userid_points")
+    mycol = dbmethod("buff_online_test", "userid_points")
     mydoc = mycol.find_one({"_id":userId})
     point = mydoc["points"]
 
@@ -526,7 +526,7 @@ def getuserIdPoints(userId):
 '''差一步就預約成功，請重新選時間函式'''
 def getalmosttakeorder(userId, thisuser_yeardate_time):
     '''差一步就預約成功，請重新選時間函式'''
-    mycol = dbmethod( "buff_online", "userid_trader_partner")
+    mycol = dbmethod( "buff_online_test", "userid_trader_partner")
     mydoc = mycol.find_one({"_id" : "userid"},{"_id":0})
     if mydoc is None:
         userid_trader_partner = dict()
@@ -535,7 +535,7 @@ def getalmosttakeorder(userId, thisuser_yeardate_time):
     
     tzone = timezone(timedelta(hours=8))
     nowtime = datetime.now(tz=tzone).isoformat()[:16]
-    mydb = myclient["buff_online"]
+    mydb = myclient["buff_online_test"]
     mycol = mydb["userid_points"]
     mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
     nicknameofthisuser = mydoc["nickname"]
@@ -575,7 +575,7 @@ def getChooseDeleteTime(userId):
     nowtime = yeardate + timedelta(minutes=30)
     yeardate = yeardate.isoformat().split("T")[0].replace("-","")[2:]
     print("日期",yeardate)
-    mycol = dbmethod("buff_online", f"final_order_{yeardate}")
+    mycol = dbmethod("buff_online_test", f"final_order_{yeardate}")
     # mydoc = mycol.find({'userId':userId},{'Date':1,'time':1})
     mydoc = mycol.find({'userId':userId}).sort('time',1)
     nowtime = nowtime.isoformat().split("T")[1][:5]
@@ -616,13 +616,13 @@ def getDeleteTimeSurelyText(surelydeletedtime, userId):
     lock = threading.Lock()
     with lock:
         try: 
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb[f"final_order_{dbyeardate}"] 
             mycol.delete_one({'time':str(surelydeletedtime)})
             print(f"指定時間{surelydeletedtime}已從最終訂單移除")
 
             nowtime = datetime.now().isoformat()[:16]
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb["userid_points"]
             mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
             nicknameofthisuser = mydoc["nickname"]
@@ -655,7 +655,7 @@ def getDeleteTimeSurelyText(surelydeletedtime, userId):
     lock = threading.Lock()
     with lock:
         try: 
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb["yeardate_time"]
             mycol.update_one({'_id':yeardate[5:7]},{'$set':{yeardate:yeardatetimelist}},True)
             print(f"把上述指定時間{surelydeletedtime}，從該日期的時間清單移除")
@@ -678,7 +678,7 @@ def getRealFinalOrder(userId, ordered_time_list, checklist):
     with lock:
         try:
             id = datetime.now().isoformat()[5:7]
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb["yeardate_time"]
             mycol.update_one({'_id':id},{'$set':{yeardate:ordered_time_list}},True)
             print("日期的時間清單更新成功")
@@ -692,7 +692,7 @@ def getRealFinalOrder(userId, ordered_time_list, checklist):
     lock =threading.Lock()
     with lock:
         try:
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb[f"final_order_{yeardate}"]
             time_id = checklist.index(time)
             # mycol.insert_one({"_id":str(time_id).zfill(2)})
@@ -700,7 +700,7 @@ def getRealFinalOrder(userId, ordered_time_list, checklist):
             print("暫時訂單寫入確認訂單成功。")
             tzone = timezone(timedelta(hours=8))
             nowtime = datetime.now(tz=tzone).isoformat()[:16]
-            mydb = myclient["buff_online"]
+            mydb = myclient["buff_online_test"]
             mycol = mydb["userid_points"]
             mydoc = mycol.find_one({"_id":userId},{"_id":0, "nickname": 1})
             nicknameofthisuser = mydoc["nickname"]
@@ -737,7 +737,7 @@ def getRealFinalOrder(userId, ordered_time_list, checklist):
 '''取得當前狀態，休息or營業'''
 def getNowState():
     '''取得當前狀態，休息or營業'''
-    mycol = dbmethod("buff_online", "state")
+    mycol = dbmethod("buff_online_test", "state")
     mydoc = mycol.find_one({"_id":0},{"_id":0}) 
     state = mydoc["state"]
     return state
@@ -795,7 +795,7 @@ def getChangeUserstate(userId:str, state:int):
     lock = threading.Lock()
     with lock:    
         Reserve_willing = state
-        mycol = dbmethod("buff_online", "userid_points")
+        mycol = dbmethod("buff_online_test", "userid_points")
         mycol.update_one({"_id":userId},{"$set":{"userid_state":Reserve_willing}},True)
 
 
@@ -805,7 +805,7 @@ def getUseridstate(userId):
     lock = threading.Lock()
     with lock:    
         try:
-            mycol = dbmethod("buff_online", "userid_points")
+            mycol = dbmethod("buff_online_test", "userid_points")
             mydoc = mycol.find_one({"_id":userId})
             Reserve_willing = mydoc["userid_state"]
         except:
@@ -871,7 +871,7 @@ def getnotreachfivepoints(remainder):
 '''查看點數卡'''
 def getMypointsCard(userId):
     '''查看點數卡'''
-    mydb = myclient["buff_online"]
+    mydb = myclient["buff_online_test"]
     mycol = mydb["userid_points"]
     mydoc = mycol.find_one({"_id":userId})
     
